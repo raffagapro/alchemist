@@ -427,9 +427,13 @@ module.exports = (sequelize) => {
         }
     });
 
-    // Card.associate = function(models) {
-    //     Card.belongsTo(models.User, { foreignKey: 'ownerId', as: 'owner' });
-    // };
+    Card.associate = function(models) {
+        // Card.belongsTo(models.User, { foreignKey: 'ownerId', as: 'owner' });
+        Card.hasMany(models.InventoryItem, {
+            foreignKey: 'cardId',
+            as: 'inventoryItems'
+        });
+    };
 
     return Card;
 };
