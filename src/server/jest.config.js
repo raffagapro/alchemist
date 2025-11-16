@@ -3,7 +3,6 @@ module.exports = {
   coverageDirectory: 'coverage',
   collectCoverageFrom: [
     'src/**/*.js',
-    '!src/tasks/**',
     '!**/node_modules/**'
   ],
   testMatch: [

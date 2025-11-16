@@ -23,9 +23,15 @@ async function downloadBulkData(bulkType = 'all_cards') {
     console.log('Fetching bulk data information from Scryfall...');
     const bulkInfo = await fetchJSON(SCRYFALL_BULK_API);
     
+    if (!bulkInfo || !bulkInfo.data) {
+      console.error('Unexpected API response:', JSON.stringify(bulkInfo, null, 2));
+      throw new Error('Invalid response from Scryfall API - missing data array');
+    }
+
     const targetBulk = bulkInfo.data.find(item => item.type === bulkType);
     if (!targetBulk) {
-      throw new Error(`Bulk data type "${bulkType}" not found`);
+      const availableTypes = bulkInfo.data.map(item => item.type).join(', ');
+      throw new Error(`Bulk data type "${bulkType}" not found. Available: ${availableTypes}`);
     }
 
     const downloadUrl = targetBulk.download_uri;
@@ -74,14 +80,29 @@ async function downloadBulkData(bulkType = 'all_cards') {
  */
 function fetchJSON(url) {
   return new Promise((resolve, reject) => {
-    https.get(url, (res) => {
+    https.get(url, {
+      headers: {
+        'User-Agent': 'AlchemistApp/1.0'
+      }
+    }, (res) => {
+      // Handle redirects
+      if (res.statusCode === 301 || res.statusCode === 302) {
+        return fetchJSON(res.headers.location).then(resolve).catch(reject);
+      }
+
+      if (res.statusCode !== 200) {
+        reject(new Error(`HTTP ${res.statusCode}: ${res.statusMessage}`));
+        return;
+      }
+
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
         try {
-          resolve(JSON.parse(data));
+          const parsed = JSON.parse(data);
+          resolve(parsed);
         } catch (e) {
-          reject(new Error('Failed to parse JSON response'));
+          reject(new Error(`Failed to parse JSON response: ${e.message}`));
         }
       });
     }).on('error', reject);
