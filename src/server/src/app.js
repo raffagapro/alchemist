@@ -1,5 +1,6 @@
 const express = require('express');
 const routerCard = require('./routes/routerCard');
+const routerAdmin = require('./routes/routerAdmin');
 
 const app = express();
 
@@ -21,5 +22,7 @@ const app = express();
 
 app.use(express.json());
 app.use('/cards', routerCard);
+
+app.use('/admin', routerAdmin);
 
 module.exports = app;

@@ -7,6 +7,7 @@
     "download-bulk": "node src/tasks/downloadBulkData.js",
     "sync-cards": "node src/tasks/runSync.js",
     "update-cards": "npm run download-bulk && npm run sync-cards",
+    "seed:admin": "node src/seeds/seedAdminStore.js",
     "start": "nodemon index.js",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -15,6 +16,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "pg": "^8.16.3",
